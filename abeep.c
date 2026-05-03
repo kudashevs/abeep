@@ -1,4 +1,5 @@
 #include <alsa/asoundlib.h>
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -16,6 +17,7 @@
  */
 void beep(float freq, int duration) {
 	snd_pcm_t *playback_handle;
+
 	if(snd_pcm_open(&playback_handle, PCM_DEFAULT, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
 		perror("Can't connect to the default interface");
 		exit(EXIT_FAILURE);
@@ -25,6 +27,9 @@ void beep(float freq, int duration) {
 		perror("Can't set connection parameters");
 		exit(EXIT_FAILURE);
 	}
+
+	assert(freq != 0);
+	assert(duration != 0);
 
 	int samples = (SAMPLE_RATE * duration) / 1000;
 	if (samples > MAX_SAMPLES) {
