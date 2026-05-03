@@ -7,6 +7,7 @@
 #define SAMPLE_RATE 8000
 #define FREQUENCY 750.0
 #define DURATION 200
+#define MAX_SAMPLES 4194304
 
 /*
  * Generates a beep via ALSA Audio API
@@ -26,6 +27,10 @@ void beep(float freq, int duration) {
 	}
 
 	int samples = (SAMPLE_RATE * duration) / 1000;
+	if (samples > MAX_SAMPLES) {
+		perror("Number of samples exceeds safety limits");
+		exit(EXIT_FAILURE);
+	}
 
 	uint8_t *buffer = malloc(samples);
 	if (buffer == NULL) {
