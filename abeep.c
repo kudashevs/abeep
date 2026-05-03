@@ -18,7 +18,7 @@ void beep(float freq, int duration) {
 		exit(EXIT_FAILURE);
 	}
 
-	if (snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8, SND_PCM_ACCESS_RW_INTERLEAVED, 1, SAMPLE_RATE, 1, 500000) < 0) {
+	if (snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8, SND_PCM_ACCESS_RW_INTERLEAVED, 1, SAMPLE_RATE, 1, 1000000) < 0) {
 		perror("Can't set connection parameters");
 		exit(EXIT_FAILURE);
 	}
