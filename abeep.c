@@ -26,7 +26,14 @@ void beep(float freq, int duration) {
 	}
 
 	int samples = (SAMPLE_RATE * duration) / 1000;
-	uint8_t buffer[samples];
+
+	uint8_t *buffer = malloc(samples);
+	if (buffer == NULL) {
+		perror("Can't allocate necessary memory");
+		exit(EXIT_FAILURE);
+	}
+
+
 	for (int i = 0; i < samples; i++) {
 		buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / SAMPLE_RATE));
 	}
@@ -37,6 +44,7 @@ void beep(float freq, int duration) {
 		exit(EXIT_FAILURE);
 	}
 
+	free(buffer);
 	snd_pcm_drain(playback_handle);
 	snd_pcm_close(playback_handle);
 }
