@@ -5,6 +5,8 @@
 
 #define PCM_DEFAULT "default"
 #define SAMPLE_RATE 8000
+#define FREQUENCY 750.0
+#define DURATION 200
 
 /*
  * Generates a beep via ALSA Audio API
@@ -40,7 +42,7 @@ void beep(float freq, int duration) {
 }
 
 int main() {
-	beep(440, 200);
+	beep(FREQUENCY, DURATION);
 
 	return EXIT_SUCCESS;
 }
