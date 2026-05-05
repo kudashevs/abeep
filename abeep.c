@@ -1,7 +1,7 @@
 #include <alsa/asoundlib.h>
 #include <assert.h>
-#include <math.h>
 #include <libgen.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -63,7 +63,28 @@ void beep(float freq, int duration) {
   snd_pcm_close(playback_handle);
 }
 
+static void print_help(char* name) {
+  fprintf(stdout,
+          "Usage:%s [OPTION]... \n"
+          "-h		this help\n",
+          basename(name));
+}
+
 int main(int argc, char** argv) {
+  int opt;
+
+  while ((opt = getopt(argc, argv, "hi")) != EOF) {
+    switch (opt) {
+      case 'h':
+        print_help(argv[0]);
+        exit(EXIT_SUCCESS);
+
+      case '?':
+        fprintf(stderr, "Unknown option -%c", optopt);
+        exit(EXIT_FAILURE);
+    }
+  }
+
   beep(FREQUENCY, DURATION);
 
   return EXIT_SUCCESS;
