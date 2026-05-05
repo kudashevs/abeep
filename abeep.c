@@ -17,7 +17,7 @@
  * @param freq Beep frequency in Hz.
  * @param duration Beep duration in ms.
  */
-void beep(float freq, int duration) {
+void beep(float freq, int rate, int duration) {
   snd_pcm_t* playback_handle;
 
   if (snd_pcm_open(&playback_handle, PCM_DEFAULT, SND_PCM_STREAM_PLAYBACK, 0) <
@@ -27,7 +27,7 @@ void beep(float freq, int duration) {
   }
 
   if (snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
-                         SND_PCM_ACCESS_RW_INTERLEAVED, 1, SAMPLE_RATE, 1,
+                         SND_PCM_ACCESS_RW_INTERLEAVED, 1, rate, 1,
                          1000000) < 0) {
     perror("Can't set connection parameters");
     exit(EXIT_FAILURE);
@@ -36,7 +36,7 @@ void beep(float freq, int duration) {
   assert(freq != 0);
   assert(duration != 0);
 
-  int samples = (SAMPLE_RATE * duration) / 1000;
+  int samples = (rate * duration) / 1000;
   if (samples > MAX_SAMPLES) {
     perror("Number of samples exceeds safety limits");
     exit(EXIT_FAILURE);
@@ -49,7 +49,7 @@ void beep(float freq, int duration) {
   }
 
   for (int i = 0; i < samples; i++) {
-    buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / SAMPLE_RATE));
+    buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / rate));
   }
 
   if (snd_pcm_writei(playback_handle, buffer, samples) < 0) {
@@ -136,6 +136,9 @@ static void print_info() {
 }
 
 int main(int argc, char** argv) {
+  float freq = FREQUENCY;
+  int rate = SAMPLE_RATE;
+  int duration = DURATION;
   int opt;
 
   while ((opt = getopt(argc, argv, "hi")) != EOF) {
@@ -154,7 +157,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  beep(FREQUENCY, DURATION);
+  beep(freq, rate, duration);
 
   return EXIT_SUCCESS;
 }
