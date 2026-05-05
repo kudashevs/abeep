@@ -71,30 +71,30 @@ static void print_help(char* name) {
 }
 
 static void get_default_device_hints() {
-    void **hints, **n;
-    char *name, *desc;
+  void **hints, **n;
+  char *name, *desc;
 
-    if (snd_device_name_hint(-1, "pcm", &hints) < 0) {
-        perror("Can't retrieve device information");
-        exit(EXIT_FAILURE);
+  if (snd_device_name_hint(-1, "pcm", &hints) < 0) {
+    perror("Can't retrieve device information");
+    exit(EXIT_FAILURE);
+  }
+
+  for (n = hints; *n; n++) {
+    name = snd_device_name_get_hint(*n, "NAME");
+
+    if (name && strcmp(name, "default") == 0) {
+      desc = snd_device_name_get_hint(*n, "DESC");
+
+      printf("Device: %s (%s)\n", name, desc ? desc : "N/A");
+
+      if (desc) free(desc);
+      break;
     }
 
-    for (n = hints; *n; n++) {
-        name = snd_device_name_get_hint(*n, "NAME");
+    if (name) free(name);
+  }
 
-        if (name && strcmp(name, "default") == 0) {
-            desc = snd_device_name_get_hint(*n, "DESC");
-
-            printf("Device: %s (%s)\n", name, desc ? desc : "N/A");
-
-            if (desc) free(desc);
-            break;
-        }
-
-        if (name) free(name);
-    }
-
-    snd_device_name_free_hint(hints);
+  snd_device_name_free_hint(hints);
 }
 
 static void print_info() {
