@@ -70,6 +70,71 @@ static void print_help(char* name) {
           basename(name));
 }
 
+static void get_default_device_hints() {
+    void **hints, **n;
+    char *name, *desc;
+
+    if (snd_device_name_hint(-1, "pcm", &hints) < 0) {
+        perror("Can't retrieve device information");
+        exit(EXIT_FAILURE);
+    }
+
+    for (n = hints; *n; n++) {
+        name = snd_device_name_get_hint(*n, "NAME");
+
+        if (name && strcmp(name, "default") == 0) {
+            desc = snd_device_name_get_hint(*n, "DESC");
+
+            printf("Device: %s (%s)\n", name, desc ? desc : "N/A");
+
+            if (desc) free(desc);
+            break;
+        }
+
+        if (name) free(name);
+    }
+
+    snd_device_name_free_hint(hints);
+}
+
+static void print_info() {
+  snd_pcm_t* handle;
+  snd_pcm_hw_params_t* params;
+  unsigned int tmp_u, tmp_min, tmp_max;
+  int tmp_i;
+
+  get_default_device_hints();
+
+  if (snd_pcm_open(&handle, PCM_DEFAULT, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+    perror("Can't connect to the default interface");
+    exit(EXIT_FAILURE);
+  }
+
+  snd_pcm_hw_params_alloca(&params);
+  if (snd_pcm_hw_params_any(handle, params) < 0) {
+    perror("Can't get device parameters\n");
+    exit(EXIT_FAILURE);
+  }
+
+  snd_pcm_hw_params_get_rate(params, &tmp_u, &tmp_i);
+  printf("Default rate: %u Hz\n", tmp_u);
+
+  snd_pcm_hw_params_get_rate_min(params, &tmp_min, &tmp_i);
+  snd_pcm_hw_params_get_rate_max(params, &tmp_max, &tmp_i);
+  printf("Rate range: %u to %u Hz\n", tmp_min, tmp_max);
+
+  tmp_u = tmp_i = tmp_min = tmp_max = 0;
+
+  snd_pcm_hw_params_get_channels(params, &tmp_u);
+  printf("Default channels: %u\n", tmp_u);
+
+  snd_pcm_hw_params_get_channels_min(params, &tmp_min);
+  snd_pcm_hw_params_get_channels_max(params, &tmp_max);
+  printf("Channels range: %u to %u Hz\n", tmp_min, tmp_max);
+
+  snd_pcm_close(handle);
+}
+
 int main(int argc, char** argv) {
   int opt;
 
@@ -77,6 +142,10 @@ int main(int argc, char** argv) {
     switch (opt) {
       case 'h':
         print_help(argv[0]);
+        exit(EXIT_SUCCESS);
+
+      case 'i':
+        print_info();
         exit(EXIT_SUCCESS);
 
       case '?':
