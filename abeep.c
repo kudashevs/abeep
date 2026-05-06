@@ -7,9 +7,9 @@
 #include <unistd.h>
 
 #define DEFAULT_PCM "default"
-#define FREQUENCY 750.0
-#define SAMPLE_RATE 8000
-#define DURATION 200
+#define DEFAULT_FREQUENCY 750.0
+#define DEFAULT_SAMPLE_RATE 8000
+#define DEFAULT_DURATION 200
 
 #define MAX_SAMPLES 4194304
 
@@ -132,9 +132,9 @@ static void print_info() {
 }
 
 int main(int argc, char** argv) {
-  float freq = FREQUENCY;
-  int rate = SAMPLE_RATE;
-  int duration = DURATION;
+  float freq = DEFAULT_FREQUENCY;
+  int rate = DEFAULT_SAMPLE_RATE;
+  int duration = DEFAULT_DURATION;
   int opt;
 
   while ((opt = getopt(argc, argv, "hi")) != EOF) {
