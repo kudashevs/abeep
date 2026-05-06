@@ -19,6 +19,8 @@
 #define MAX_SAMPLES 4194304
 #define MIN_SAMPLE_RATE 4000
 #define MAX_SAMPLE_RATE 96000
+#define MIN_FREQUENCY 40.0f
+#define MAX_FREQUENCY 16000.0f
 #define MIN_DURATION 20
 #define MAX_DURATION 3600000
 
@@ -76,6 +78,8 @@ void beep(float freq, int rate, int duration) {
 static void print_help() {
   FILE* output = stdout;
   fprintf(output, "Usage: %s [OPTION]... \n", DEFAULT_NAME);
+  fprintf(output, "-f       beep's frequency in Hz (min %.2f, max %.2f Hz)\n",
+          MIN_FREQUENCY, MAX_FREQUENCY);
   fprintf(output, "-r       audio stream rate in Hz (min %d, max %d Hz)\n",
           MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
   fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
@@ -143,13 +147,13 @@ static void print_info() {
   snd_pcm_close(handle);
 }
 
-static void validate_length(int val) {
-  int min = MIN_DURATION;
-  int max = MAX_DURATION;
+static void validate_frequency(float val) {
+  float min = MIN_FREQUENCY;
+  float max = MAX_FREQUENCY;
 
   if (!IS_VALID(val, min, max)) {
-    fprintf(stderr, "Option -l is out of range (min: %d ms, max: %d ms)\n", min,
-            max);
+    fprintf(stderr, "Option -f is out of range (min: %.2f ms, max: %.2f Hz)\n",
+            min, max);
     exit(EXIT_FAILURE);
   }
 }
@@ -165,14 +169,30 @@ static void validate_rate(int val) {
   }
 }
 
+static void validate_length(int val) {
+  int min = MIN_DURATION;
+  int max = MAX_DURATION;
+
+  if (!IS_VALID(val, min, max)) {
+    fprintf(stderr, "Option -l is out of range (min: %d ms, max: %d ms)\n", min,
+            max);
+    exit(EXIT_FAILURE);
+  }
+}
+
 int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":hir:l:")) != EOF) {
+  while ((opt = getopt(argc, argv, ":hif:r:l:")) != EOF) {
     switch (opt) {
+      case 'f':
+        float freq_candidate = atof(optarg);
+        validate_frequency(freq_candidate);
+        freq = freq_candidate;
+        break;
       case 'r':
         int rate_candidate = atoi(optarg);
         validate_rate(rate_candidate);
