@@ -17,6 +17,8 @@
 #define DEFAULT_LATENCY 1000000
 
 #define MAX_SAMPLES 4194304
+#define MIN_SAMPLE_RATE 4000
+#define MAX_SAMPLE_RATE 96000
 #define MIN_DURATION 20
 #define MAX_DURATION 3600000
 
@@ -74,6 +76,8 @@ void beep(float freq, int rate, int duration) {
 static void print_help() {
   FILE* output = stdout;
   fprintf(output, "Usage: %s [OPTION]... \n", DEFAULT_NAME);
+  fprintf(output, "-r       audio stream rate in Hz (min %d, max %d Hz)\n",
+          MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
   fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
           MIN_DURATION, MAX_DURATION);
   fprintf(output, "-h       print help\n");
@@ -150,14 +154,31 @@ static void validate_length(int val) {
   }
 }
 
+static void validate_rate(int val) {
+  int min = MIN_SAMPLE_RATE;
+  int max = MAX_SAMPLE_RATE;
+
+  if (!IS_VALID(val, min, max)) {
+    fprintf(stderr, "Option -r is out of range (min: %d ms, max: %d Hz)\n", min,
+            max);
+    exit(EXIT_FAILURE);
+  }
+}
+
 int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":hil:")) != EOF) {
+  while ((opt = getopt(argc, argv, ":hir:l:")) != EOF) {
     switch (opt) {
+      case 'r':
+        int rate_candidate = atoi(optarg);
+        validate_rate(rate_candidate);
+        rate = rate_candidate;
+        break;
+
       case 'l':
         int duration_candidate = atoi(optarg);
         validate_length(duration_candidate);
