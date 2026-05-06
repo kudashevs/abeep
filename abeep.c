@@ -46,18 +46,19 @@ void beep(float freq, int rate, int duration) {
   assert(duration != 0);
   assert(duration >= MIN_DURATION && duration <= MAX_DURATION);
 
+  int err;
   snd_pcm_t* playback_handle;
 
-  if (int err = snd_pcm_open(&playback_handle, DEFAULT_PCM,
-                             SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+  err = snd_pcm_open(&playback_handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
+  if (err < 0) {
     print_alsa_error(err, "Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
 
-  if (int err =
-          snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
-                             SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS,
-                             rate, 1, DEFAULT_LATENCY) < 0) {
+  err = snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
+                           SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS,
+                           rate, 1, DEFAULT_LATENCY);
+  if (err < 0) {
     print_alsa_error(err, "Can't set connection parameters");
     exit(EXIT_FAILURE);
   }
@@ -78,7 +79,8 @@ void beep(float freq, int rate, int duration) {
     buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / rate));
   }
 
-  if (int err = snd_pcm_writei(playback_handle, buffer, samples) < 0) {
+  err = snd_pcm_writei(playback_handle, buffer, samples);
+  if (err < 0) {
     print_alsa_error(err, "Can't write to the connection");
     snd_pcm_close(playback_handle);
     exit(EXIT_FAILURE);
@@ -102,10 +104,12 @@ static void print_help() {
 }
 
 static void get_default_device_hints() {
+  int err;
   void **hints, **n;
   char *name, *desc;
 
-  if (int err = snd_device_name_hint(-1, "pcm", &hints) < 0) {
+  err = snd_device_name_hint(-1, "pcm", &hints);
+  if (err < 0) {
     print_alsa_error(err, "Can't retrieve device information");
     exit(EXIT_FAILURE);
   }
@@ -129,21 +133,23 @@ static void get_default_device_hints() {
 }
 
 static void print_info() {
+  int err, tmp_i;
+  unsigned int tmp_u, tmp_min, tmp_max;
   snd_pcm_t* handle;
   snd_pcm_hw_params_t* params;
-  unsigned int tmp_u, tmp_min, tmp_max;
-  int tmp_i;
 
   get_default_device_hints();
 
-  if (int err =
-          snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+  err = snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
+  if (err < 0) {
     print_alsa_error(err, "Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
 
   snd_pcm_hw_params_alloca(&params);
-  if (int err = snd_pcm_hw_params_any(handle, params) < 0) {
+
+  err = snd_pcm_hw_params_any(handle, params);
+  if (err < 0) {
     print_alsa_error(err, "Can't get device parameters\n");
     exit(EXIT_FAILURE);
   }
