@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define IS_VALID(val, min, max) ((val >= min && val <= max))
+
 #define DEFAULT_NAME "abeep"
 #define DEFAULT_PCM "default"
 #define DEFAULT_FREQUENCY 750.0
@@ -16,6 +18,7 @@
 
 #define MAX_SAMPLES 4194304
 #define MIN_DURATION 20
+#define MAX_DURATION 3600000
 
 /*
  * Generates a beep via ALSA Audio API
@@ -71,7 +74,8 @@ void beep(float freq, int rate, int duration) {
 static void print_help() {
   FILE* output = stdout;
   fprintf(output, "Usage:%s [OPTION]... \n", DEFAULT_NAME);
-  fprintf(output, "-l       beep's duration in ms");
+  fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
+          MIN_DURATION, MAX_DURATION);
   fprintf(output, "-h       print help\n");
 }
 
@@ -135,6 +139,17 @@ static void print_info() {
   snd_pcm_close(handle);
 }
 
+static void validate_length(int val) {
+  int min = MIN_DURATION;
+  int max = MAX_DURATION;
+
+  if (!IS_VALID(val, min, max)) {
+    fprintf(stderr, "Option -l is out of range (min: %d ms, max: %d ms)\n", min,
+            max);
+    exit(EXIT_FAILURE);
+  }
+}
+
 int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
@@ -144,7 +159,9 @@ int main(int argc, char** argv) {
   while ((opt = getopt(argc, argv, ":hil:")) != EOF) {
     switch (opt) {
       case 'l':
-        duration = atoi(optarg);
+        int duration_candidate = atoi(optarg);
+        validate_length(duration_candidate);
+        duration = duration_candidate;
         break;
 
       case 'h':
