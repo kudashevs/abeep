@@ -26,8 +26,9 @@
 
 /*
  * Generates a beep via ALSA Audio API
- * @param freq Beep frequency in Hz.
- * @param duration Beep duration in ms.
+ * @param freq Beep's frequency in Hz.
+ * @param rete Audio stream rate in Hz.
+ * @param duration Beep's duration in ms.
  */
 void beep(float freq, int rate, int duration) {
   snd_pcm_t* playback_handle;
