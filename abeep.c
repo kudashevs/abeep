@@ -135,8 +135,8 @@ static void print_info() {
 
 int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
-  int rate = DEFAULT_SAMPLE_RATE;
-  int duration = DEFAULT_DURATION;
+  unsigned int rate = DEFAULT_SAMPLE_RATE;
+  unsigned int duration = DEFAULT_DURATION;
   int opt;
 
   while ((opt = getopt(argc, argv, "hi")) != EOF) {
