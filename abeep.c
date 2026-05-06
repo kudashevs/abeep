@@ -24,7 +24,15 @@
 #define MIN_DURATION 20
 #define MAX_DURATION 3600000
 
-/*
+static void print_alsa_error(int err, const char* msg) {
+  if (err < 0) {
+    fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
+  } else {
+    fprintf(stderr, "%s", msg);
+  }
+}
+
+/**
  * Generates a beep via ALSA Audio API
  * @param freq Beep's frequency in Hz.
  * @param rete Audio stream rate in Hz.
@@ -33,16 +41,17 @@
 void beep(float freq, int rate, int duration) {
   snd_pcm_t* playback_handle;
 
-  if (snd_pcm_open(&playback_handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) <
-      0) {
-    perror("Can't connect to the default interface");
+  if (int err = snd_pcm_open(&playback_handle, DEFAULT_PCM,
+                             SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+    print_alsa_error(err, "Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
 
-  if (snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
-                         SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS, rate,
-                         1, DEFAULT_LATENCY) < 0) {
-    perror("Can't set connection parameters");
+  if (int err =
+          snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
+                             SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS,
+                             rate, 1, DEFAULT_LATENCY) < 0) {
+    print_alsa_error(err, "Can't set connection parameters");
     exit(EXIT_FAILURE);
   }
 
@@ -65,8 +74,8 @@ void beep(float freq, int rate, int duration) {
     buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / rate));
   }
 
-  if (snd_pcm_writei(playback_handle, buffer, samples) < 0) {
-    perror("Can't write to the connection");
+  if (int err = snd_pcm_writei(playback_handle, buffer, samples) < 0) {
+    print_alsa_error(err, "Can't write to the connection");
     snd_pcm_close(playback_handle);
     exit(EXIT_FAILURE);
   }
@@ -92,8 +101,8 @@ static void get_default_device_hints() {
   void **hints, **n;
   char *name, *desc;
 
-  if (snd_device_name_hint(-1, "pcm", &hints) < 0) {
-    perror("Can't retrieve device information");
+  if (int err = snd_device_name_hint(-1, "pcm", &hints) < 0) {
+    print_alsa_error(err, "Can't retrieve device information");
     exit(EXIT_FAILURE);
   }
 
@@ -123,14 +132,15 @@ static void print_info() {
 
   get_default_device_hints();
 
-  if (snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
-    perror("Can't connect to the default interface");
+  if (int err =
+          snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+    print_alsa_error(err, "Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
 
   snd_pcm_hw_params_alloca(&params);
-  if (snd_pcm_hw_params_any(handle, params) < 0) {
-    perror("Can't get device parameters\n");
+  if (int err = snd_pcm_hw_params_any(handle, params) < 0) {
+    print_alsa_error(err, "Can't get device parameters\n");
     exit(EXIT_FAILURE);
   }
 
