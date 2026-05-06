@@ -161,6 +161,10 @@ static void print_info() {
   snd_pcm_hw_params_get_channels_max(params, &tmp_max);
   printf("Channels range: %u to %u\n", tmp_min, tmp_max);
 
+  printf("Default frequency: %.2f Hz\n", DEFAULT_FREQUENCY);
+  printf("Default sample rate: %d Hz\n", DEFAULT_SAMPLE_RATE);
+  printf("Default duration: %d ms\n", DEFAULT_DURATION);
+
   snd_pcm_close(handle);
 }
 
