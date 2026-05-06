@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#define DEFAULT_NAME "abeep"
 #define DEFAULT_PCM "default"
 #define DEFAULT_FREQUENCY 750.0
 #define DEFAULT_SAMPLE_RATE 8000
@@ -67,10 +68,10 @@ void beep(float freq, int rate, int duration) {
   snd_pcm_close(playback_handle);
 }
 
-static void print_help(char* name) {
+static void print_help() {
   FILE* output = stdout;
-  fprintf(output, "Usage:%s [OPTION]... \n", basename(name));
-  fprintf(output, "-l       beep's duration in ms (min %d ms)\n", MIN_DURATION);
+  fprintf(output, "Usage:%s [OPTION]... \n", DEFAULT_NAME);
+  fprintf(output, "-l       beep's duration in ms");
   fprintf(output, "-h       print help\n");
 }
 
@@ -147,7 +148,7 @@ int main(int argc, char** argv) {
         break;
 
       case 'h':
-        print_help(argv[0]);
+        print_help();
         exit(EXIT_SUCCESS);
 
       case 'i':
