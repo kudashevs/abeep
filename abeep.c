@@ -73,7 +73,7 @@ void beep(float freq, int rate, int duration) {
 
 static void print_help() {
   FILE* output = stdout;
-  fprintf(output, "Usage:%s [OPTION]... \n", DEFAULT_NAME);
+  fprintf(output, "Usage: %s [OPTION]... \n", DEFAULT_NAME);
   fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
           MIN_DURATION, MAX_DURATION);
   fprintf(output, "-h       print help\n");
