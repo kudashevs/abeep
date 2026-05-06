@@ -11,6 +11,7 @@
 #define DEFAULT_SAMPLE_RATE 8000
 #define DEFAULT_DURATION 200
 #define DEFAULT_CHANNELS 1
+#define DEFAULT_LATENCY 1000000
 
 #define MAX_SAMPLES 4194304
 
@@ -30,7 +31,7 @@ void beep(float freq, int rate, int duration) {
 
   if (snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
                          SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS, rate,
-                         1, 1000000) < 0) {
+                         1, DEFAULT_LATENCY) < 0) {
     perror("Can't set connection parameters");
     exit(EXIT_FAILURE);
   }
