@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -O2 -Wall
 LDLIBS = -lasound -lm
 TARGET = abeep
 SRC = $(wildcard *.c)
