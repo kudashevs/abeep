@@ -123,14 +123,9 @@ static void print_info() {
   snd_pcm_hw_params_get_rate_max(params, &tmp_max, &tmp_i);
   printf("Rate range: %u to %u Hz\n", tmp_min, tmp_max);
 
-  tmp_u = tmp_i = tmp_min = tmp_max = 0;
-
-  snd_pcm_hw_params_get_channels(params, &tmp_u);
-  printf("Default channels: %u\n", tmp_u);
-
   snd_pcm_hw_params_get_channels_min(params, &tmp_min);
   snd_pcm_hw_params_get_channels_max(params, &tmp_max);
-  printf("Channels range: %u to %u Hz\n", tmp_min, tmp_max);
+  printf("Channels range: %u to %u\n", tmp_min, tmp_max);
 
   snd_pcm_close(handle);
 }
