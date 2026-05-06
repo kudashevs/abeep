@@ -133,8 +133,8 @@ static void get_default_device_hints() {
 }
 
 static void print_info() {
-  int err, tmp_i;
-  unsigned int tmp_u, tmp_min, tmp_max;
+  int err, dir;
+  unsigned int tmp_min = 0, tmp_max = 0;
   snd_pcm_t* handle;
   snd_pcm_hw_params_t* params;
 
@@ -147,18 +147,14 @@ static void print_info() {
   }
 
   snd_pcm_hw_params_alloca(&params);
-
   err = snd_pcm_hw_params_any(handle, params);
   if (err < 0) {
     print_alsa_error(err, "Can't get device parameters\n");
     exit(EXIT_FAILURE);
   }
 
-  snd_pcm_hw_params_get_rate(params, &tmp_u, &tmp_i);
-  printf("Default rate: %u Hz\n", tmp_u);
-
-  snd_pcm_hw_params_get_rate_min(params, &tmp_min, &tmp_i);
-  snd_pcm_hw_params_get_rate_max(params, &tmp_max, &tmp_i);
+  snd_pcm_hw_params_get_rate_min(params, &tmp_min, &dir);
+  snd_pcm_hw_params_get_rate_max(params, &tmp_max, &dir);
   printf("Rate range: %u to %u Hz\n", tmp_min, tmp_max);
 
   snd_pcm_hw_params_get_channels_min(params, &tmp_min);
