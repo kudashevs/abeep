@@ -6,10 +6,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define PCM_DEFAULT "default"
-#define SAMPLE_RATE 8000
+#define DEFAULT_PCM "default"
 #define FREQUENCY 750.0
+#define SAMPLE_RATE 8000
 #define DURATION 200
+
 #define MAX_SAMPLES 4194304
 
 /*
@@ -20,7 +21,7 @@
 void beep(float freq, int rate, int duration) {
   snd_pcm_t* playback_handle;
 
-  if (snd_pcm_open(&playback_handle, PCM_DEFAULT, SND_PCM_STREAM_PLAYBACK, 0) <
+  if (snd_pcm_open(&playback_handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) <
       0) {
     perror("Can't connect to the default interface");
     exit(EXIT_FAILURE);
@@ -105,7 +106,7 @@ static void print_info() {
 
   get_default_device_hints();
 
-  if (snd_pcm_open(&handle, PCM_DEFAULT, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
+  if (snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0) < 0) {
     perror("Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
