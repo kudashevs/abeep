@@ -39,6 +39,13 @@ static void print_alsa_error(int err, const char* msg) {
  * @param duration Beep's duration in ms.
  */
 void beep(float freq, int rate, int duration) {
+  assert(freq != 0);
+  assert(freq >= MIN_FREQUENCY && freq <= MAX_FREQUENCY);
+  assert(rate != 0);
+  assert(rate >= MIN_SAMPLE_RATE && rate <= MAX_SAMPLE_RATE);
+  assert(duration != 0);
+  assert(duration >= MIN_DURATION && duration <= MAX_DURATION);
+
   snd_pcm_t* playback_handle;
 
   if (int err = snd_pcm_open(&playback_handle, DEFAULT_PCM,
@@ -54,9 +61,6 @@ void beep(float freq, int rate, int duration) {
     print_alsa_error(err, "Can't set connection parameters");
     exit(EXIT_FAILURE);
   }
-
-  assert(freq != 0);
-  assert(duration != 0);
 
   int samples = (rate * duration) / 1000;
   if (samples > MAX_SAMPLES) {
