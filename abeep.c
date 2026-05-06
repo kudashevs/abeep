@@ -14,6 +14,7 @@
 #define DEFAULT_LATENCY 1000000
 
 #define MAX_SAMPLES 4194304
+#define MIN_DURATION 20
 
 /*
  * Generates a beep via ALSA Audio API
@@ -67,10 +68,10 @@ void beep(float freq, int rate, int duration) {
 }
 
 static void print_help(char* name) {
-  fprintf(stdout,
-          "Usage:%s [OPTION]... \n"
-          "-h		this help\n",
-          basename(name));
+  FILE* output = stdout;
+  fprintf(output, "Usage:%s [OPTION]... \n", basename(name));
+  fprintf(output, "-l       beep's duration in ms (min %d ms)\n", MIN_DURATION);
+  fprintf(output, "-h       print help\n");
 }
 
 static void get_default_device_hints() {
@@ -139,8 +140,12 @@ int main(int argc, char** argv) {
   unsigned int duration = DEFAULT_DURATION;
   int opt;
 
-  while ((opt = getopt(argc, argv, "hi")) != EOF) {
+  while ((opt = getopt(argc, argv, ":hil:")) != EOF) {
     switch (opt) {
+      case 'l':
+        duration = atoi(optarg);
+        break;
+
       case 'h':
         print_help(argv[0]);
         exit(EXIT_SUCCESS);
@@ -149,8 +154,16 @@ int main(int argc, char** argv) {
         print_info();
         exit(EXIT_SUCCESS);
 
+      case ':':
+        fprintf(stderr, "Option -%c requires an argument\n", optopt);
+        exit(EXIT_FAILURE);
+
       case '?':
-        fprintf(stderr, "Unknown option -%c", optopt);
+        fprintf(stderr, "Unknown option -%c\n", optopt);
+        exit(EXIT_FAILURE);
+
+      default:
+        fprintf(stderr, "Something went wrong. Please create an issue.\n");
         exit(EXIT_FAILURE);
     }
   }
