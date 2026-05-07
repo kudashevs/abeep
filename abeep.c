@@ -16,6 +16,9 @@
 #define DEFAULT_CHANNELS 1
 #define DEFAULT_LATENCY 1000000
 
+#define OPT_PROCESS_STR (1 << 4)
+#define INPUT_BUF_SIZE 4096
+
 #define MAX_SAMPLES 4194304
 #define MIN_SAMPLE_RATE 4000
 #define MAX_SAMPLE_RATE 96000
@@ -100,6 +103,7 @@ static void print_help() {
           MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
   fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
           MIN_DURATION, MAX_DURATION);
+  fprintf(output, "-s       process input and beep on every string\n");
   fprintf(output, "-i       display device and program information\n");
   fprintf(output, "-h       print help\n");
 }
@@ -203,12 +207,14 @@ static void validate_length(int val) {
 }
 
 int main(int argc, char** argv) {
+  char buf[INPUT_BUF_SIZE];
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
+  unsigned int flags = 0;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":f:r:l:ih")) != EOF) {
+  while ((opt = getopt(argc, argv, ":f:r:l:sih")) != EOF) {
     switch (opt) {
       case 'f':
         float freq_candidate = atof(optarg);
@@ -225,6 +231,10 @@ int main(int argc, char** argv) {
         int duration_candidate = atoi(optarg);
         validate_length(duration_candidate);
         duration = duration_candidate;
+        break;
+
+      case 's':
+        flags |= OPT_PROCESS_STR;
         break;
 
       case 'i':
@@ -249,7 +259,14 @@ int main(int argc, char** argv) {
     }
   }
 
-  beep(freq, rate, duration);
+  if (flags & OPT_PROCESS_STR) {
+    while (fgets(buf, INPUT_BUF_SIZE, stdin)) {
+      beep(freq, rate, duration);
+      fputs(buf, stdout);
+    }
+  } else {
+    beep(freq, rate, duration);
+  }
 
   return EXIT_SUCCESS;
 }
