@@ -16,6 +16,7 @@
 
 #define IS_VALID(val, min, max) ((val >= min && val <= max))
 
+#define VERSION_STRING "1.0.0"
 #define DEFAULT_NAME "abeep"
 #define DEFAULT_PCM "default"
 #define DEFAULT_FREQUENCY 750.0
@@ -113,7 +114,14 @@ static void print_help() {
           MIN_DURATION, MAX_DURATION);
   fprintf(output, "-s       process input and beep on every string\n");
   fprintf(output, "-i       display device and program information\n");
+  fprintf(output, "-V       display version information\n");
   fprintf(output, "-h       print help\n");
+}
+
+static void print_version() {
+  fprintf(stdout, "%s %s\n", DEFAULT_NAME, VERSION_STRING);
+  fprintf(stdout, "Copyright (c) 2026 Sergey Kudashev\n");
+  fprintf(stdout, "Licensed under the MIT License.\n");
 }
 
 static void get_default_device_hints() {
@@ -222,7 +230,7 @@ int main(int argc, char** argv) {
   unsigned int flags = 0;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":f:r:l:sih")) != EOF) {
+  while ((opt = getopt(argc, argv, ":f:r:l:siVh")) != EOF) {
     switch (opt) {
       case 'f':
         float freq_candidate = atof(optarg);
@@ -251,6 +259,10 @@ int main(int argc, char** argv) {
 
       case 'h':
         print_help();
+        exit(EXIT_SUCCESS);
+
+      case 'V':
+        print_version();
         exit(EXIT_SUCCESS);
 
       case ':':
