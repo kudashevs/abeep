@@ -1,3 +1,11 @@
+/*
+ * abeep - a beep program that uses the ALSA audio API to play sound.
+ *
+ * Copyright (c) 2026 Sergey Kudashev
+ * Licensed under the MIT License.
+ * See LICENSE.md file in the project root for full license information.
+ */
+
 #include <alsa/asoundlib.h>
 #include <assert.h>
 #include <libgen.h>
