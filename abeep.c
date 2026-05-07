@@ -208,7 +208,7 @@ int main(int argc, char** argv) {
   unsigned int duration = DEFAULT_DURATION;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":hif:r:l:")) != EOF) {
+  while ((opt = getopt(argc, argv, ":f:r:l:ih")) != EOF) {
     switch (opt) {
       case 'f':
         float freq_candidate = atof(optarg);
@@ -227,12 +227,12 @@ int main(int argc, char** argv) {
         duration = duration_candidate;
         break;
 
-      case 'h':
-        print_help();
-        exit(EXIT_SUCCESS);
-
       case 'i':
         print_info();
+        exit(EXIT_SUCCESS);
+
+      case 'h':
+        print_help();
         exit(EXIT_SUCCESS);
 
       case ':':
