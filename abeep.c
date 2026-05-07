@@ -100,6 +100,7 @@ static void print_help() {
           MIN_SAMPLE_RATE, MAX_SAMPLE_RATE);
   fprintf(output, "-l       beep's duration in ms (min %d, max %d ms)\n",
           MIN_DURATION, MAX_DURATION);
+  fprintf(output, "-i       display device and program information\n");
   fprintf(output, "-h       print help\n");
 }
 
