@@ -138,7 +138,7 @@ static void get_default_device_hints() {
   for (n = hints; *n; n++) {
     name = snd_device_name_get_hint(*n, "NAME");
 
-    if (name && strcmp(name, "default") == 0) {
+    if (name && strcmp(name, DEFAULT_PCM) == 0) {
       desc = snd_device_name_get_hint(*n, "DESC");
 
       printf("Device: %s (%s)\n", name, desc ? desc : "N/A");
