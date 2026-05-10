@@ -39,8 +39,6 @@
 static void print_alsa_error(int err, const char* msg) {
   if (err < 0) {
     fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
-  } else {
-    fprintf(stderr, "%s", msg);
   }
 }
 
