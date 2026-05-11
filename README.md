@@ -20,8 +20,9 @@ meke install
 -l       beep's duration in ms (min 20, max 3600000 ms)
 -s       process input and beep on every string
 -i       display device and program information
--V       display version information
+-v       run in verbose mode
 -h       print help
+-V       display version information
 ```
 
 

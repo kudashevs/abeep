@@ -124,8 +124,9 @@ static void print_help() {
           MIN_DURATION, MAX_DURATION);
   fprintf(output, "-s       process input and beep on every string\n");
   fprintf(output, "-i       display device and program information\n");
-  fprintf(output, "-V       display version information\n");
+  fprintf(output, "-v       run in verbose mode\n");
   fprintf(output, "-h       print help\n");
+  fprintf(output, "-V       display version information\n");
 }
 
 static void print_version() {
