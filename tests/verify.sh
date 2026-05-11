@@ -1,0 +1,1 @@
+../vendor/ApprovalTests.shell/verify.sh
