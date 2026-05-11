@@ -25,6 +25,7 @@
 #define DEFAULT_CHANNELS 1
 #define DEFAULT_LATENCY 1000000
 
+#define OPT_VERBOSE (1 << 1)
 #define OPT_PROCESS_STR (1 << 4)
 #define INPUT_BUF_SIZE 4096
 
@@ -232,7 +233,7 @@ int main(int argc, char** argv) {
 
   init_pcm_handle(&handle);
 
-  while ((opt = getopt(argc, argv, ":f:r:l:sihV")) != EOF) {
+  while ((opt = getopt(argc, argv, ":f:r:l:sivhV")) != EOF) {
     switch (opt) {
       case 'f':
         float freq_candidate = atof(optarg);
@@ -258,6 +259,10 @@ int main(int argc, char** argv) {
       case 'i':
         print_info(handle);
         exit(EXIT_SUCCESS);
+
+      case 'v':
+        flags |= OPT_VERBOSE;
+        break;
 
       case 'h':
         print_help();
