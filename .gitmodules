@@ -1,0 +1,3 @@
+[submodule "vendor/ApprovalTests.shell"]
+	path = vendor/ApprovalTests.shell
+	url = https://github.com/kudashevs/ApprovalTests.shell
