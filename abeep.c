@@ -37,6 +37,8 @@
 #define MIN_DURATION 20
 #define MAX_DURATION 3600000
 
+static unsigned int flags = 0;
+
 static void print_alsa_error(int err, const char* msg) {
   if (err < 0) {
     fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
@@ -228,7 +230,6 @@ int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
-  unsigned int flags = 0;
   int opt;
 
   init_pcm_handle(&handle);
