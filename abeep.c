@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
   unsigned int flags = 0;
   int opt;
 
-  while ((opt = getopt(argc, argv, ":f:r:l:siVh")) != EOF) {
+  while ((opt = getopt(argc, argv, ":f:r:l:sihV")) != EOF) {
     switch (opt) {
       case 'f':
         float freq_candidate = atof(optarg);
