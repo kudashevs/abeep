@@ -42,13 +42,24 @@ static void print_alsa_error(int err, const char* msg) {
   }
 }
 
+static void init_pcm_handle(snd_pcm_t** handle) {
+  int err = snd_pcm_open(handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
+  if (err < 0) {
+    print_alsa_error(err, "Can't connect to the default interface");
+    exit(EXIT_FAILURE);
+  }
+}
+
+static void close_pcm_handle(snd_pcm_t* handle) { snd_pcm_close(handle); }
+
 /**
  * Generates a beep via ALSA Audio API
  * @param freq Beep's frequency in Hz.
  * @param rete Audio stream rate in Hz.
  * @param duration Beep's duration in ms.
  */
-void beep(float freq, int rate, int duration) {
+void beep(snd_pcm_t* handle, float freq, int rate, int duration) {
+  assert(handle != NULL);
   assert(freq != 0);
   assert(freq >= MIN_FREQUENCY && freq <= MAX_FREQUENCY);
   assert(rate != 0);
@@ -57,31 +68,27 @@ void beep(float freq, int rate, int duration) {
   assert(duration >= MIN_DURATION && duration <= MAX_DURATION);
 
   int err;
-  snd_pcm_t* playback_handle;
 
-  err = snd_pcm_open(&playback_handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
-  if (err < 0) {
-    print_alsa_error(err, "Can't connect to the default interface");
-    exit(EXIT_FAILURE);
-  }
-
-  err = snd_pcm_set_params(playback_handle, SND_PCM_FORMAT_U8,
+  err = snd_pcm_set_params(handle, SND_PCM_FORMAT_U8,
                            SND_PCM_ACCESS_RW_INTERLEAVED, DEFAULT_CHANNELS,
                            rate, 1, DEFAULT_LATENCY);
   if (err < 0) {
     print_alsa_error(err, "Can't set connection parameters");
+    close_pcm_handle(handle);
     exit(EXIT_FAILURE);
   }
 
   int samples = (rate * duration) / 1000;
   if (samples > MAX_SAMPLES) {
     perror("Number of samples exceeds safety limits");
+    close_pcm_handle(handle);
     exit(EXIT_FAILURE);
   }
 
   uint8_t* buffer = malloc(samples);
   if (buffer == NULL) {
     perror("Can't allocate necessary memory");
+    close_pcm_handle(handle);
     exit(EXIT_FAILURE);
   }
 
@@ -89,16 +96,16 @@ void beep(float freq, int rate, int duration) {
     buffer[i] = (uint8_t)(128 + 127 * sin(2 * M_PI * freq * i / rate));
   }
 
-  err = snd_pcm_writei(playback_handle, buffer, samples);
+  err = snd_pcm_writei(handle, buffer, samples);
+
   if (err < 0) {
     print_alsa_error(err, "Can't write to the connection");
-    snd_pcm_close(playback_handle);
+    snd_pcm_close(handle);
     exit(EXIT_FAILURE);
   }
 
   free(buffer);
-  snd_pcm_drain(playback_handle);
-  snd_pcm_close(playback_handle);
+  snd_pcm_drain(handle);
 }
 
 static void print_help() {
@@ -151,24 +158,20 @@ static void get_default_device_hints() {
   snd_device_name_free_hint(hints);
 }
 
-static void print_info() {
+static void print_info(snd_pcm_t* handle) {
+  assert(handle != NULL);
+
   int err, dir;
   unsigned int tmp_min = 0, tmp_max = 0;
-  snd_pcm_t* handle;
   snd_pcm_hw_params_t* params;
 
   get_default_device_hints();
-
-  err = snd_pcm_open(&handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
-  if (err < 0) {
-    print_alsa_error(err, "Can't connect to the default interface");
-    exit(EXIT_FAILURE);
-  }
 
   snd_pcm_hw_params_alloca(&params);
   err = snd_pcm_hw_params_any(handle, params);
   if (err < 0) {
     print_alsa_error(err, "Can't get device parameters\n");
+    close_pcm_handle(handle);
     exit(EXIT_FAILURE);
   }
 
@@ -183,8 +186,6 @@ static void print_info() {
   printf("Default frequency: %.2f Hz\n", DEFAULT_FREQUENCY);
   printf("Default sample rate: %d Hz\n", DEFAULT_SAMPLE_RATE);
   printf("Default duration: %d ms\n", DEFAULT_DURATION);
-
-  snd_pcm_close(handle);
 }
 
 static void validate_frequency(float val) {
@@ -221,12 +222,15 @@ static void validate_length(int val) {
 }
 
 int main(int argc, char** argv) {
+  snd_pcm_t* handle = NULL;
   char buf[INPUT_BUF_SIZE];
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
   unsigned int flags = 0;
   int opt;
+
+  init_pcm_handle(&handle);
 
   while ((opt = getopt(argc, argv, ":f:r:l:sihV")) != EOF) {
     switch (opt) {
@@ -252,7 +256,7 @@ int main(int argc, char** argv) {
         break;
 
       case 'i':
-        print_info();
+        print_info(handle);
         exit(EXIT_SUCCESS);
 
       case 'h':
@@ -279,12 +283,14 @@ int main(int argc, char** argv) {
 
   if (flags & OPT_PROCESS_STR) {
     while (fgets(buf, INPUT_BUF_SIZE, stdin)) {
-      beep(freq, rate, duration);
+      beep(handle, freq, rate, duration);
       fputs(buf, stdout);
     }
   } else {
-    beep(freq, rate, duration);
+    beep(handle, freq, rate, duration);
   }
+
+  close_pcm_handle(handle);
 
   return EXIT_SUCCESS;
 }
