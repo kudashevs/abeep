@@ -1,0 +1,10 @@
+[stage] Open a connection to the default interface
+[stage] Gathering information about devices
+Device: default (Default ALSA Output (currently PipeWire Media Server))
+[stage] Gatherng information about the default interface
+Rate range: 1 to 384000 Hz
+Channels range: 1 to 64
+[stage] Gathering information about the program
+Default frequency: 750.00 Hz
+Default sample rate: 8000 Hz
+Default duration: 200 ms

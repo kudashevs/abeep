@@ -14,7 +14,9 @@ fi
 
 echo ""
 
-../abeep -i | ./verify.sh -t storage/run-info
+stdbuf -oL -eL ../abeep -i 2>&1 | ./verify.sh -t storage/run-info
+
+stdbuf -oL -eL ../abeep -i -v 2>&1 | ./verify.sh -t storage/run-info-verbose
 
 ../abeep -V | ./verify.sh -t storage/run-version
 

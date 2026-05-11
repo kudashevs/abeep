@@ -45,6 +45,10 @@ static void print_alsa_error(int err, const char* msg) {
   }
 }
 
+static void print_verbose(char* msg) { fprintf(stderr, "[stage] %s\n", msg); }
+
+static int isVerbose() { return flags & OPT_VERBOSE; }
+
 static int isProcessString() { return flags & OPT_PROCESS_STR; }
 
 static void init_pcm_handle(snd_pcm_t** handle) {
@@ -53,9 +57,19 @@ static void init_pcm_handle(snd_pcm_t** handle) {
     print_alsa_error(err, "Can't connect to the default interface");
     exit(EXIT_FAILURE);
   }
+
+  if (isVerbose()) {
+    print_verbose("Open a connection to the default interface");
+  }
 }
 
-static void close_pcm_handle(snd_pcm_t* handle) { snd_pcm_close(handle); }
+static void close_pcm_handle(snd_pcm_t* handle) {
+  snd_pcm_close(handle);
+
+  if (isVerbose()) {
+    print_verbose("Close a connection to the default interface");
+  }
+}
 
 /**
  * Generates a beep via ALSA Audio API
@@ -146,6 +160,10 @@ static void get_default_device_hints() {
     exit(EXIT_FAILURE);
   }
 
+  if (isVerbose()) {
+    print_verbose("Gathering information about devices");
+  }
+
   for (n = hints; *n; n++) {
     name = snd_device_name_get_hint(*n, "NAME");
 
@@ -173,6 +191,10 @@ static void print_info(snd_pcm_t* handle) {
 
   get_default_device_hints();
 
+  if (isVerbose()) {
+    print_verbose("Gatherng information about the default interface");
+  }
+
   snd_pcm_hw_params_alloca(&params);
   err = snd_pcm_hw_params_any(handle, params);
   if (err < 0) {
@@ -189,6 +211,10 @@ static void print_info(snd_pcm_t* handle) {
   snd_pcm_hw_params_get_channels_max(params, &tmp_max);
   printf("Channels range: %u to %u\n", tmp_min, tmp_max);
 
+  if (isVerbose()) {
+    print_verbose("Gathering information about the program");
+  }
+
   printf("Default frequency: %.2f Hz\n", DEFAULT_FREQUENCY);
   printf("Default sample rate: %d Hz\n", DEFAULT_SAMPLE_RATE);
   printf("Default duration: %d ms\n", DEFAULT_DURATION);
@@ -197,6 +223,10 @@ static void print_info(snd_pcm_t* handle) {
 static void validate_frequency(float val) {
   float min = MIN_FREQUENCY;
   float max = MAX_FREQUENCY;
+
+  if (isVerbose()) {
+    print_verbose("Validating a frequency value");
+  }
 
   if (!IS_VALID(val, min, max)) {
     fprintf(stderr, "Option -f is out of range (min: %.2f ms, max: %.2f Hz)\n",
@@ -209,6 +239,10 @@ static void validate_rate(int val) {
   int min = MIN_SAMPLE_RATE;
   int max = MAX_SAMPLE_RATE;
 
+  if (isVerbose()) {
+    print_verbose("Validating a rate value");
+  }
+
   if (!IS_VALID(val, min, max)) {
     fprintf(stderr, "Option -r is out of range (min: %d ms, max: %d Hz)\n", min,
             max);
@@ -219,6 +253,10 @@ static void validate_rate(int val) {
 static void validate_length(int val) {
   int min = MIN_DURATION;
   int max = MAX_DURATION;
+
+  if (isVerbose()) {
+    print_verbose("Validating a length value");
+  }
 
   if (!IS_VALID(val, min, max)) {
     fprintf(stderr, "Option -l is out of range (min: %d ms, max: %d ms)\n", min,
