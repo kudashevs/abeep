@@ -45,6 +45,8 @@ static void print_alsa_error(int err, const char* msg) {
   }
 }
 
+static int isProcessString() { return flags & OPT_PROCESS_STR; }
+
 static void init_pcm_handle(snd_pcm_t** handle) {
   int err = snd_pcm_open(handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
   if (err < 0) {
@@ -287,7 +289,7 @@ int main(int argc, char** argv) {
     }
   }
 
-  if (flags & OPT_PROCESS_STR) {
+  if (isProcessString()) {
     while (fgets(buf, INPUT_BUF_SIZE, stdin)) {
       beep(handle, freq, rate, duration);
       fputs(buf, stdout);
