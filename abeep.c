@@ -232,9 +232,7 @@ int main(int argc, char** argv) {
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
-  int opt;
-
-  init_pcm_handle(&handle);
+  int opt, moreinfo = 0;
 
   while ((opt = getopt(argc, argv, ":f:r:l:sivhV")) != EOF) {
     switch (opt) {
@@ -260,8 +258,8 @@ int main(int argc, char** argv) {
         break;
 
       case 'i':
-        print_info(handle);
-        exit(EXIT_SUCCESS);
+        moreinfo = 1;
+        break;
 
       case 'v':
         flags |= OPT_VERBOSE;
@@ -287,6 +285,13 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Something went wrong. Please create an issue.\n");
         exit(EXIT_FAILURE);
     }
+  }
+
+  init_pcm_handle(&handle);
+
+  if (moreinfo) {
+    print_info(handle);
+    exit(EXIT_SUCCESS);
   }
 
   if (isProcessString()) {
