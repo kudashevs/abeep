@@ -70,23 +70,23 @@ static int isVerbose() { return flags & OPT_VERBOSE; }
 
 static int isProcessString() { return flags & OPT_PROCESS_STR; }
 
-static void init_pcm_handle(snd_pcm_t** handle) {
-  int err = snd_pcm_open(handle, DEFAULT_PCM, SND_PCM_STREAM_PLAYBACK, 0);
+static void init_pcm_handle(snd_pcm_t** handle, char* pcm_device) {
+  int err = snd_pcm_open(handle, pcm_device, SND_PCM_STREAM_PLAYBACK, 0);
   if (err < 0) {
-    print_alsa_error(err, "Can't connect to the default interface");
+    print_alsa_error(err, "Can't connect to the %s pcm device", pcm_device);
     exit(EXIT_FAILURE);
   }
 
   if (isVerbose()) {
-    print_verbose("Open a connection to the default interface");
+    print_verbose("Open a connection to the %s pcm device", pcm_device);
   }
 }
 
-static void close_pcm_handle(snd_pcm_t* handle) {
+static void close_pcm_handle(snd_pcm_t* handle, char* pcm_device) {
   snd_pcm_close(handle);
 
   if (isVerbose()) {
-    print_verbose("Close a connection to the default interface");
+    print_verbose("Close a connection to the %s pcm device", pcm_device);
   }
 }
 
@@ -96,7 +96,8 @@ static void close_pcm_handle(snd_pcm_t* handle) {
  * @param rete Audio stream rate in Hz.
  * @param duration Beep's duration in ms.
  */
-void beep(snd_pcm_t* handle, float freq, int rate, int duration) {
+void beep(snd_pcm_t* handle, char* pcm_device, float freq, int rate,
+          int duration) {
   assert(handle != NULL);
   assert(freq != 0);
   assert(freq >= MIN_FREQUENCY && freq <= MAX_FREQUENCY);
@@ -112,21 +113,21 @@ void beep(snd_pcm_t* handle, float freq, int rate, int duration) {
                            rate, 1, DEFAULT_LATENCY);
   if (err < 0) {
     print_alsa_error(err, "Can't set connection parameters");
-    close_pcm_handle(handle);
+    close_pcm_handle(handle, pcm_device);
     exit(EXIT_FAILURE);
   }
 
   int samples = (rate * duration) / 1000;
   if (samples > MAX_SAMPLES) {
     perror("Number of samples exceeds safety limits");
-    close_pcm_handle(handle);
+    close_pcm_handle(handle, pcm_device);
     exit(EXIT_FAILURE);
   }
 
   uint8_t* buffer = malloc(samples);
   if (buffer == NULL) {
     perror("Can't allocate necessary memory");
-    close_pcm_handle(handle);
+    close_pcm_handle(handle, pcm_device);
     exit(EXIT_FAILURE);
   }
 
@@ -168,14 +169,14 @@ static void print_version() {
   fprintf(stdout, "Licensed under the MIT License.\n");
 }
 
-static void get_default_device_hints() {
+static void get_default_device_hints(char* pcm_device) {
   int err;
   void **hints, **n;
   char *name, *desc;
 
   err = snd_device_name_hint(-1, "pcm", &hints);
   if (err < 0) {
-    print_alsa_error(err, "Can't retrieve device information");
+    print_alsa_error(err, "Can't retrieve information about devices");
     exit(EXIT_FAILURE);
   }
 
@@ -186,7 +187,7 @@ static void get_default_device_hints() {
   for (n = hints; *n; n++) {
     name = snd_device_name_get_hint(*n, "NAME");
 
-    if (name && strcmp(name, DEFAULT_PCM) == 0) {
+    if (name && strcmp(name, pcm_device) == 0) {
       desc = snd_device_name_get_hint(*n, "DESC");
 
       printf("Device: %s (%s)\n", name, desc ? desc : "N/A");
@@ -201,24 +202,24 @@ static void get_default_device_hints() {
   snd_device_name_free_hint(hints);
 }
 
-static void print_info(snd_pcm_t* handle) {
+static void print_info(snd_pcm_t* handle, char* pcm_device) {
   assert(handle != NULL);
 
   int err, dir;
   unsigned int tmp_min = 0, tmp_max = 0;
   snd_pcm_hw_params_t* params;
 
-  get_default_device_hints();
+  get_default_device_hints(pcm_device);
 
   if (isVerbose()) {
-    print_verbose("Gatherng information about the default interface");
+    print_verbose("Gatherng information about the %s pcm device", pcm_device);
   }
 
   snd_pcm_hw_params_alloca(&params);
   err = snd_pcm_hw_params_any(handle, params);
   if (err < 0) {
-    print_alsa_error(err, "Can't get device parameters\n");
-    close_pcm_handle(handle);
+    print_alsa_error(err, "Can't get the %s pcp device parameters", pcm_device);
+    close_pcm_handle(handle, pcm_device);
     exit(EXIT_FAILURE);
   }
 
@@ -286,6 +287,7 @@ static void validate_length(int val) {
 
 int main(int argc, char** argv) {
   snd_pcm_t* handle = NULL;
+  char* pcm_device = DEFAULT_PCM;
   char buf[INPUT_BUF_SIZE];
   float freq = DEFAULT_FREQUENCY;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
@@ -345,23 +347,23 @@ int main(int argc, char** argv) {
     }
   }
 
-  init_pcm_handle(&handle);
+  init_pcm_handle(&handle, pcm_device);
 
   if (moreinfo) {
-    print_info(handle);
+    print_info(handle, pcm_device);
     exit(EXIT_SUCCESS);
   }
 
   if (isProcessString()) {
     while (fgets(buf, INPUT_BUF_SIZE, stdin)) {
-      beep(handle, freq, rate, duration);
+      beep(handle, pcm_device, freq, rate, duration);
       fputs(buf, stdout);
     }
   } else {
-    beep(handle, freq, rate, duration);
+    beep(handle, pcm_device, freq, rate, duration);
   }
 
-  close_pcm_handle(handle);
+  close_pcm_handle(handle, pcm_device);
 
   return EXIT_SUCCESS;
 }

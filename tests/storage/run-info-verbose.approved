@@ -1,7 +1,7 @@
-[stage] Open a connection to the default interface
+[stage] Open a connection to the default pcm device
 [stage] Gathering information about devices
 Device: default (Default ALSA Output (currently PipeWire Media Server))
-[stage] Gatherng information about the default interface
+[stage] Gatherng information about the default pcm device
 Rate range: 1 to 384000 Hz
 Channels range: 1 to 64
 [stage] Gathering information about the program
