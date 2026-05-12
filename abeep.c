@@ -53,7 +53,18 @@ static void print_alsa_error(int err, const char* data, ...) {
   fprintf(stderr, ": %s\n", snd_strerror(err));
 }
 
-static void print_verbose(char* msg) { fprintf(stderr, "[stage] %s\n", msg); }
+static void print_verbose(const char* data, ...) {
+  fprintf(stderr, "[stage] ");
+
+  va_list args;
+  va_start(args, data);
+
+  vfprintf(stderr, data, args);
+
+  va_end(args);
+
+  fprintf(stderr, "\n");
+}
 
 static int isVerbose() { return flags & OPT_VERBOSE; }
 
