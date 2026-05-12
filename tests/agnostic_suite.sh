@@ -2,7 +2,7 @@
 
 TESTS_DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
 
-pushd ${TESTS_DIR} || exit 1
+pushd ${TESTS_DIR} >/dev/null || exit 1
 
 if [ -z "$GITHUB_ACTIONS" ]; then
     echo "Running locally..."
@@ -21,6 +21,5 @@ echo ""
 
 ../abeep -V | ./verify.sh -t storage/run-version
 
-popd
+popd >/dev/null
 
-# @note extract helper to test with buffer

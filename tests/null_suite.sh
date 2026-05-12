@@ -2,7 +2,7 @@
 
 TESTS_DIR=$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")
 
-pushd ${TESTS_DIR} || exit 1
+pushd ${TESTS_DIR} >/dev/null || exit 1
 
 if [ -z "$GITHUB_ACTIONS" ]; then
     echo "Running locally..."
@@ -25,4 +25,5 @@ stdbuf -oL -eL ../abeep -d null -i 2>&1 | ./verify.sh -t storage/null-info
 
 stdbuf -oL -eL ../abeep -d null -i -v 2>&1 | ./verify.sh -t storage/null-info-verbose
 
-popd
+popd >/dev/null
+
