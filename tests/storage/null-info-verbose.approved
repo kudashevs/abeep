@@ -1,0 +1,10 @@
+[stage] Open a connection to the null pcm device
+[stage] Gathering information about devices
+Device: null (Discard all samples (playback) or generate zero samples (capture))
+[stage] Gatherng information about the null pcm device
+Rate range: 1 to 4294967295 Hz
+Channels range: 1 to 1073741823
+[stage] Gathering information about the program
+Default frequency: 750.00 Hz
+Default sample rate: 8000 Hz
+Default duration: 200 ms
