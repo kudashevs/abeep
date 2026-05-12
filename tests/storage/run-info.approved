@@ -1,6 +1,0 @@
-Device: default (Default ALSA Output (currently PipeWire Media Server))
-Rate range: 1 to 384000 Hz
-Channels range: 1 to 64
-Default frequency: 750.00 Hz
-Default sample rate: 8000 Hz
-Default duration: 200 ms
