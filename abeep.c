@@ -69,7 +69,7 @@ static void print_verbose(const char* data, ...) {
 
 static int isVerbose() { return flags & OPT_VERBOSE; }
 
-static int isProcessString() { return flags & OPT_PROCESS_STR; }
+static int isStringMode() { return flags & OPT_PROCESS_STR; }
 
 static void init_pcm_handle(snd_pcm_t** handle) {
   assert(pcm_device != NULL);
@@ -371,7 +371,7 @@ int main(int argc, char** argv) {
     exit(EXIT_SUCCESS);
   }
 
-  if (isProcessString()) {
+  if (isStringMode()) {
     while (fgets(buf, INPUT_BUF_SIZE, stdin)) {
       beep(handle, freq, rate, duration);
       fputs(buf, stdout);
