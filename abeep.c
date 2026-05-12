@@ -155,6 +155,7 @@ void beep(snd_pcm_t* handle, float freq, int rate, int duration) {
 static void print_help() {
   FILE* output = stdout;
   fprintf(output, "Usage: %s [OPTION]... \n", DEFAULT_NAME);
+  fprintf(output, "-d       use a specific PCM device\n");
   fprintf(output, "-f       beep's frequency in Hz (min %.2f, max %.2f Hz)\n",
           MIN_FREQUENCY, MAX_FREQUENCY);
   fprintf(output, "-r       audio stream rate in Hz (min %d, max %d Hz)\n",
@@ -301,8 +302,12 @@ int main(int argc, char** argv) {
   unsigned int duration = DEFAULT_DURATION;
   int opt, moreinfo = 0;
 
-  while ((opt = getopt(argc, argv, ":f:r:l:sivhV")) != EOF) {
+  while ((opt = getopt(argc, argv, ":d:f:r:l:sivhV")) != EOF) {
     switch (opt) {
+      case 'd':
+        pcm_device = strdup(optarg);
+        break;
+
       case 'f':
         float freq_candidate = atof(optarg);
         validate_frequency(freq_candidate);
