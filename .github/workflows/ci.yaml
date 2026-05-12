@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron:  '0 0 1 * *'
+
+jobs:
+  test:
+    name: ${{ matrix.compiler }} on ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        compiler: [gcc, clang]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Cache APT Packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-${{ matrix.compiler }}-apt-alsa-${{ hashFiles('**/Makefile') }}
+          restore-keys: ${{ runner.os }}-${{ matrix.compiler }}-apt-alsa-
+
+      - name: Setup compiler
+        run: |
+          sudo apt update
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            sudo apt install -y gcc g++
+          else
+            sudo apt install -y clang
+          fi
+          sudo apt install -y alsa-utils libasound2-dev
+
+      - name: Build project
+        run: make build
+
+      - name: Run Approval tests
+        run: ./tests/null_suite.sh
+
+      - name: Run agnostic suite
+        run: ./tests/agnostic_suite.sh
+
