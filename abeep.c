@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <libgen.h>
 #include <math.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,10 +40,17 @@
 
 static unsigned int flags = 0;
 
-static void print_alsa_error(int err, const char* msg) {
+static void print_alsa_error(int err, const char* data, ...) {
   assert(err < 0);
 
-  fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
+  va_list args;
+  va_start(args, data);
+
+  vfprintf(stderr, data, args);
+
+  va_end(args);
+
+  fprintf(stderr, ": %s\n", snd_strerror(err));
 }
 
 static void print_verbose(char* msg) { fprintf(stderr, "[stage] %s\n", msg); }
