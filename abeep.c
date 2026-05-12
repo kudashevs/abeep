@@ -303,6 +303,10 @@ int main(int argc, char** argv) {
   int opt, moreinfo = 0;
 
   while ((opt = getopt(argc, argv, ":d:f:r:l:sivhV")) != EOF) {
+    if (isVerbose()) {
+      print_verbose("Parsing command-line options");
+    }
+
     switch (opt) {
       case 'd':
         pcm_device = strdup(optarg);
