@@ -40,9 +40,9 @@
 static unsigned int flags = 0;
 
 static void print_alsa_error(int err, const char* msg) {
-  if (err < 0) {
-    fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
-  }
+  assert(err < 0);
+
+  fprintf(stderr, "%s: %s\n", msg, snd_strerror(err));
 }
 
 static void print_verbose(char* msg) { fprintf(stderr, "[stage] %s\n", msg); }
