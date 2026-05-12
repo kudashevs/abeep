@@ -1,7 +1,9 @@
 # abeep
 
+![CI](https://github.com/kudashevs/abeep/actions/workflows/ci.yaml/badge.svg)
+
 This is a beep program that uses ALSA (Advanced Linux Sound Architecture) Audio
-API as a medium to play sound.
+API to play sound.
 
 
 ## Installation
