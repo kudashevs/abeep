@@ -17,7 +17,7 @@
 
 #define IS_VALID(val, min, max) ((val >= min && val <= max))
 
-#define VERSION_STRING "1.0.0"
+#define VERSION_STRING "1.1.0"
 #define DEFAULT_NAME "abeep"
 #define DEFAULT_PCM "default"
 #define DEFAULT_FREQUENCY 750.0
