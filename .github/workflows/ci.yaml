@@ -36,15 +36,20 @@ jobs:
       - name: Setup compiler
         run: |
           sudo apt update
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            sudo apt install -y gcc g++
-          else
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
             sudo apt install -y clang
+          else
+            sudo apt install -y gcc
           fi
           sudo apt install -y alsa-utils libasound2-dev
 
       - name: Build project
-        run: make build
+        run: |
+          if [ "${{ matrix.compiler }}" = "clang" ]; then
+            make build CC=clang
+          else
+            make build CC=gcc
+          fi
 
       - name: Run Approval tests
         run: ./tests/null_suite.sh
