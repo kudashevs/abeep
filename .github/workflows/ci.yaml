@@ -51,7 +51,7 @@ jobs:
             make build CC=gcc
           fi
 
-      - name: Run Approval tests
+      - name: Run null device suite
         run: ./tests/null_suite.sh
 
       - name: Run agnostic suite
