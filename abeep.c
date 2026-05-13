@@ -297,7 +297,8 @@ static void validate_length(int val) {
 int main(int argc, char** argv) {
   snd_pcm_t* handle = NULL;
   char buf[INPUT_BUF_SIZE];
-  float freq = DEFAULT_FREQUENCY;
+  float freq_candidate, freq = DEFAULT_FREQUENCY;
+  int rate_candidate, duration_candidate;
   unsigned int rate = DEFAULT_SAMPLE_RATE;
   unsigned int duration = DEFAULT_DURATION;
   int opt, moreinfo = 0;
@@ -313,21 +314,21 @@ int main(int argc, char** argv) {
         break;
 
       case 'f':
-        float freq_candidate = atof(optarg);
+        freq_candidate = atof(optarg);
         validate_frequency(freq_candidate);
         freq = freq_candidate;
         break;
 
       case 'r':
-        int rate_candidate = atoi(optarg);
+        rate_candidate = atoi(optarg);
         validate_rate(rate_candidate);
-        rate = rate_candidate;
+        rate = (unsigned int)rate_candidate;
         break;
 
       case 'l':
-        int duration_candidate = atoi(optarg);
+        duration_candidate = atoi(optarg);
         validate_length(duration_candidate);
-        duration = duration_candidate;
+        duration = (unsigned int)duration_candidate;
         break;
 
       case 's':
