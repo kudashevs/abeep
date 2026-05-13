@@ -1,7 +1,7 @@
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 
-CC = gcc
+CC ?= gcc
 CFLAGS = -O2 -Wall
 LDLIBS = -lasound -lm
 TARGET = abeep
